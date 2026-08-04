@@ -459,8 +459,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     function build(){
       var d=document.createElement('div');d.id=ID;
-      d.innerHTML='<p class="kh-t">Damit Ihre Spende zugeordnet werden kann und Sie eine Spendenbescheinigung erhalten, tragen Sie bitte hier Ihre Adresse ein. Daraus entsteht der fertige Verwendungszweck zum Kopieren.</p>'
-      +'<div class="kh-r"><div class="kh-f" style="flex:2"><label for="kh-s">Stra&szlig;e</label><input id="kh-s" type="text" autocomplete="address-line1" placeholder="Musterstra&szlig;e"></div>'
+      d.innerHTML='<p class="kh-t">Der Verwendungszweck wirkt etwas sperrig, ist aber notwendig. &bdquo;K.Hochstrate&ldquo; ist das Stichwort, so dass die Spenden sp&auml;ter selektiert werden k&ouml;nnen. Die Adressen der spendenden Personen sind wichtig f&uuml;r sp&auml;tere Spendenbescheinigungen.</p>'
+        +'<div class="kh-r"><div class="kh-f" style="flex:2"><label for="kh-s">Stra&szlig;e</label><input id="kh-s" type="text" autocomplete="address-line1" placeholder="Musterstra&szlig;e"></div>'
       +'<div class="kh-f" style="flex:1"><label for="kh-n">Nr.</label><input id="kh-n" type="text" placeholder="12"></div></div>'
       +'<div class="kh-r"><div class="kh-f" style="flex:1"><label for="kh-p">PLZ</label><input id="kh-p" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="12345"></div>'
       +'<div class="kh-f" style="flex:2"><label for="kh-o">Ort</label><input id="kh-o" type="text" autocomplete="address-level2" placeholder="Musterstadt"></div></div>'
@@ -547,8 +547,17 @@ var OLD=/DE\s*95\s*3053\s*0000\s*0150\s*0100\s*07/;
       }
     }catch(e){}
     var done=0;
-    var iv=setInterval(function(){tries++;fixIban();if(place())done++;if(done>20||tries>200)clearInterval(iv);},300);
+    function hideQR(){
+      var q=document.querySelector('img[alt*="QR"],img[alt*="qr"]');
+      if(!q)return;
+      var cap=q.nextElementSibling;
+      q.style.display='none';
+      if(cap&&/Spenden im Gedenken/i.test(cap.textContent||''))cap.style.display='none';
+    }
+    var done=0;
+    var iv=setInterval(function(){tries++;fixIban();hideQR();if(place())done++;if(done>20||tries>200)clearInterval(iv);},300);
     fixIban();
+    hideQR();
     place();
   })();
 </script>
