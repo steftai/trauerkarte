@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if(c)t+=', '+c;
         if(e)t+=', '+e;
         if(f)t+=', '+f;
-        out.textContent=t;
+        out.textContent=sepa(t);
         b.disabled=!(a&&c&&e&&f);
       }
       [s,n,p,o].forEach(function(x){x.addEventListener('input',up);});
@@ -555,9 +555,33 @@ var OLD=/DE\s*95\s*3053\s*0000\s*0150\s*0100\s*07/;
       if(cap&&/Spenden im Gedenken/i.test(cap.textContent||''))cap.style.display='none';
     }
     var done=0;
-    var iv=setInterval(function(){tries++;fixIban();hideQR();if(place())done++;if(done>20||tries>200)clearInterval(iv);},300);
+    function sepa(x){
+      var m={'Ä':'Ae','ä':'ae','Ö':'Oe','ö':'oe','Ü':'Ue','ü':'ue','ß':'ss','€':'E','$':'S','£':'L'};
+      x=String(x).replace(/[ÄäÖöÜüß€$£]/g,function(c){return m[c];});
+      try{x=x.normalize('NFD').replace(/[̀-ͯ]/g,'');}catch(e){}
+      x=x.replace(/[^A-Za-z0-9\/\?:\(\)\.,'+\- &]/g,' ');
+  x=x.replace(/\s+/g,' ').trim();
+      return x.slice(0,140);
+    }
+    var CAFE='https://www.google.com/maps/search/?api=1&query=Caf%C3%A9%20im%20Feld%2C%20Meyerhofstra%C3%9Fe%2094%2C%2032257%20B%C3%BCnde';
+    function fixCafe(){
+      var els=document.querySelectorAll('div,p');
+      for(var i=0;i<els.length;i++){
+        var e=els[i];
+        if(e.getAttribute('data-khcafe'))return;
+        var x=e.textContent||'';
+        if(x.length>160)continue;
+        if(x.indexOf('[Adresse]')<0)continue;
+        if(e.querySelector('div,p'))continue;
+        e.setAttribute('data-khcafe','1');
+        e.innerHTML='<div style="font-weight:600">Caf&eacute; im Feld</div><div>Meyerhofstra&szlig;e 94</div><div>32257 B&uuml;nde</div><div style="margin-top:10px"><a href="'+CAFE+'" target="_blank" rel="noopener" style="color:#A8842C;text-decoration:none;border-bottom:1px solid rgba(168,132,44,.45);padding-bottom:1px;font-size:.92em;letter-spacing:.02em">Auf Google Maps ansehen</a></div>';
+        return;
+      }
+    }
+    var iv=setInterval(function(){tries++;fixIban();hideQR();fixCafe();if(place())done++;if(done>20||tries>200)clearInterval(iv);},300);
     fixIban();
     hideQR();
+    fixCafe();
     place();
   })();
 </script>
