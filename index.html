@@ -435,3 +435,88 @@ document.addEventListener('DOMContentLoaded', async function() {
   </script>
 </body>
 </html>
+
+<script>
+  (function(){
+    var ID='kh-vzw';
+    function css(){
+      if(document.getElementById(ID+'-css'))return;
+      var s=document.createElement('style');s.id=ID+'-css';
+      s.textContent='#kh-vzw{margin:18px 0 4px;font-family:inherit;text-align:left}'
+      +'#kh-vzw .kh-t{font-size:13px;line-height:1.5;color:#6b6455;margin:0 0 12px}'
+      +'#kh-vzw .kh-r{display:flex;gap:8px;margin-bottom:8px}'
+      +'#kh-vzw .kh-f{display:flex;flex-direction:column;flex:1}'
+      +'#kh-vzw label{font-size:11px;color:#9a927f;margin-bottom:4px;letter-spacing:.03em}'
+      +'#kh-vzw input{border:1px solid #ded6c4;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;background:#fff;color:#3a352b;width:100%;box-sizing:border-box}'
+      +'#kh-vzw input:focus{outline:none;border-color:#A8842C;box-shadow:0 0 0 3px rgba(168,132,44,.13)}'
+      +'#kh-vzw .kh-h{font-size:11px;color:#a8a08d;margin:0 0 12px 2px}'
+      +'#kh-vzw .kh-o{background:#fff;border:1px dashed #d8cfb8;border-radius:10px;padding:10px 12px;font-size:13px;color:#3a352b;margin-bottom:8px;word-break:break-word;min-height:18px}'
+      +'#kh-vzw .kh-b{width:100%;background:#A8842C;color:#fff;border:none;border-radius:9px;padding:10px;font-size:14px;font-family:inherit;cursor:pointer}'
+      +'#kh-vzw .kh-b:disabled{opacity:.35;cursor:not-allowed}'
+      +'#kh-vzw .kh-n{font-size:10.5px;color:#a8a08d;margin:8px 0 0;text-align:center}'
+      +'@media(max-width:400px){#kh-vzw .kh-r{flex-direction:column;gap:8px}}';
+      (document.head||document.documentElement).appendChild(s);
+    }
+    function build(){
+      var d=document.createElement('div');d.id=ID;
+      d.innerHTML='<p class="kh-t">Damit Ihre Spende zugeordnet werden kann und Sie eine Spendenbescheinigung erhalten, tragen Sie bitte hier Ihre Adresse ein. Daraus entsteht der fertige Verwendungszweck zum Kopieren.</p>'
+      +'<div class="kh-r"><div class="kh-f" style="flex:2"><label for="kh-s">Stra&szlig;e</label><input id="kh-s" type="text" autocomplete="address-line1" placeholder="Musterstra&szlig;e"></div>'
+      +'<div class="kh-f" style="flex:1"><label for="kh-n">Nr.</label><input id="kh-n" type="text" placeholder="12"></div></div>'
+      +'<div class="kh-r"><div class="kh-f" style="flex:1"><label for="kh-p">PLZ</label><input id="kh-p" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="12345"></div>'
+      +'<div class="kh-f" style="flex:2"><label for="kh-o">Ort</label><input id="kh-o" type="text" autocomplete="address-level2" placeholder="Musterstadt"></div></div>'
+      +'<p class="kh-h">Diese Angaben bleiben auf Ihrem Ger&auml;t. Nichts wird gespeichert oder versendet.</p>'
+      +'<div class="kh-o" id="kh-out">K.Hochstrate,</div>'
+      +'<button type="button" class="kh-b" id="kh-cp" disabled>Verwendungszweck kopieren</button>'
+      +'<p class="kh-n">Diesen Text bei der &Uuml;berweisung als Verwendungszweck einf&uuml;gen.</p>';
+      return d;
+    }
+    function wire(d){
+      var s=d.querySelector('#kh-s'),n=d.querySelector('#kh-n'),p=d.querySelector('#kh-p'),o=d.querySelector('#kh-o'),out=d.querySelector('#kh-out'),b=d.querySelector('#kh-cp');
+      function up(){
+        var a=s.value.trim(),c=n.value.trim(),e=p.value.trim(),f=o.value.trim();
+        var t='K.Hochstrate';
+        if(a||c)t+=', '+a+(c?' '+c:'');
+        if(e||f)t+=', '+e+(f?' '+f:'');
+        out.textContent=t;
+        b.disabled=!(a&&c&&e&&f);
+      }
+      [s,n,p,o].forEach(function(x){x.addEventListener('input',up);});
+      up();
+      b.addEventListener('click',function(){
+        var t=out.textContent,lbl=b.textContent;
+        function ok(){b.textContent='Kopiert';setTimeout(function(){b.textContent=lbl;},1600);}
+        function fb(){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(x){}document.body.removeChild(ta);}
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){fb();ok();});}else{fb();ok();}
+      });
+    }
+    function findIban(){
+      var all=document.querySelectorAll('div,section,p,li,td,span');
+      for(var i=all.length-1;i>=0;i--){
+        var el=all[i];
+        if(el.closest('#'+ID))continue;
+        var txt=el.textContent||'';
+        if(txt.length>400)continue;
+        if(!/DE\s*\d{2}[\s\d]{12,}/.test(txt))continue;
+        var host=el;
+        while(host.parentElement&&host.parentElement!==document.body&&host.parentElement.getBoundingClientRect().width<=host.getBoundingClientRect().width+2&&(host.parentElement.textContent||'').length<txt.length+300)host=host.parentElement;
+        return host;
+      }
+      return null;
+    }
+    var tries=0;
+    function place(){
+      if(document.getElementById(ID))return true;
+      var t=findIban();
+      if(!t)return false;
+      css();
+      var d=build();
+      t.parentNode.insertBefore(d,t.nextSibling);
+      wire(d);
+      return true;
+    }
+    var iv=setInterval(function(){tries++;if(place()||tries>200)clearInterval(iv);},300);
+    place();
+  })();
+</script>
+
+</script>
