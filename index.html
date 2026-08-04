@@ -475,8 +475,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       function up(){
         var a=s.value.trim(),c=n.value.trim(),e=p.value.trim(),f=o.value.trim();
         var t='K.Hochstrate';
-        if(a||c)t+=', '+a+(c?' '+c:'');
-        if(e||f)t+=', '+e+(f?' '+f:'');
+        if(a)t+=', '+a;
+        if(c)t+=', '+c;
+        if(e)t+=', '+e;
+        if(f)t+=', '+f;
         out.textContent=t;
         b.disabled=!(a&&c&&e&&f);
       }
