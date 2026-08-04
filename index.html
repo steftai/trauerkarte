@@ -536,8 +536,8 @@ var OLD=/DE\s*95\s*3053\s*0000\s*0150\s*0100\s*07/;
     var NEW='DE62 3053 0000 0150 0100 19';
     function fixIban(){
       var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null),n,list=[];
-      while(n=w.nextNode()){if(OLD.test(n.nodeValue||''))list.push(n);}
-      for(var i=0;i<list.length;i++){list[i].nodeValue=list[i].nodeValue.replace(OLD,NEW);}
+while(n=w.nextNode()){var v=n.nodeValue||'';if(OLD.test(v)||v.indexOf('Café am Feld')>-1)list.push(n);}
+    for(var i=0;i<list.length;i++){list[i].nodeValue=list[i].nodeValue.replace(OLD,NEW).split('Café am Feld').join('Café im Feld');}
     }
     try{
       if(navigator.clipboard&&navigator.clipboard.writeText&&!navigator.clipboard.__khfix){
